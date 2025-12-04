@@ -1,3 +1,28 @@
+.ac-history {
+  margin-top: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+}
+
+.ac-step {
+  margin-bottom: 15px;
+  padding: 5px;
+  border-bottom: 1px solid #ccc;
+}
+
+.ac-step h4 {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.board-before, .board-after {
+  display: inline-block;
+  margin-right: 10px;
+}
+
 /* =========================================
    1. General App Layout & Background
    ========================================= */

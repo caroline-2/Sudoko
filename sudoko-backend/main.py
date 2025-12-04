@@ -1,3 +1,4 @@
+import time
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import copy
@@ -14,7 +15,6 @@ def generate():
     board = generate_random_board(difficulty)
     return jsonify({"board": board})
 
-
 @app.route('/api/solve', methods=['POST'])
 def solve():
     data = request.json
@@ -23,19 +23,21 @@ def solve():
         return jsonify({"error": "No board"}), 400
 
     solver_board = copy.deepcopy(board)
-
     domains = domain(solver_board)
 
-    arc_consistency(domains)
-
-    solved, final_domains = arc_backtrack(domains)
+    start_time = time.time()
+    ac_result, ac_history = arc_consistency(domains)
+    solved, final_domains, final_history = arc_backtrack(domains, ac_history)
     final_board = board_from_domains(final_domains)
+    
+    end_time = time.time()
 
     return jsonify({
         "solved": solved,
         "solution": final_board,
+        "time_taken": end_time - start_time,
+        "history": final_history
     })
-
 
 @app.route('/api/validate_board', methods=['POST'])
 def validate():

@@ -8,10 +8,12 @@ const App = () => {
   const [board, setBoard] = useState(Array(9).fill(0).map(() => Array(9).fill(0)));
   const [initial, setInitial] = useState(Array(9).fill(0).map(() => Array(9).fill(0)));
   const [errors, setErrors] = useState(new Set());
+  const [acHistory, setAcHistory] = useState([]);
+
   const [selectedCell, setSelectedCell] = useState(null);
   
   // Modes
-  const [gameMode, setGameMode] = useState('mode3'); 
+  const [gameMode, setGameMode] = useState('mode1'); 
   const [mode, setMode] = useState('input'); 
   const [status, setStatus] = useState("");
   const [aiMoves, setAiMoves] = useState(new Set()); 
@@ -49,7 +51,7 @@ const App = () => {
     return () => clearTimeout(timeoutId);
   }, [board]);
 
- const handleSolve = async () => {
+const handleSolve = async () => {
   try {
     setStatus("Agent is thinking...");
 
@@ -61,11 +63,13 @@ const App = () => {
 
     const data = await res.json();
 
-    // Always show the AC-3 processed board
     const acBoard = data.solution;
     setBoard(acBoard);
+    setAcHistory(data.history || []);
+    console.log("AC-3 History:", data.history);
 
-    // Highlight cells filled by AC-3
+
+    // Highlight AI moves
     const newAiMoves = new Set();
     for (let r = 0; r < 9; r++) {
       for (let c = 0; c < 9; c++) {
@@ -76,13 +80,19 @@ const App = () => {
     }
     setAiMoves(newAiMoves);
 
-   setStatus(data.solved ? "Puzzle Solved!" : "No solution exists.");
+    // Show solved status + time
+    if (data.solved) {
+      setStatus(`Puzzle Solved! ✅ Time: ${data.time_taken.toFixed(3)}s`);
+    } else {
+      setStatus(`No solution exists. ⛔ Time: ${data.time_taken.toFixed(3)}s`);
+    }
 
   } catch (error) {
     console.error("Error solving:", error);
     setStatus("Error connecting to backend server.");
   }
 };
+
 
   // 3. Generate Random Puzzle
  const handleGenerate = async (difficulty = "intermediate") => {
@@ -177,6 +187,7 @@ const App = () => {
               // aiMoves is passed down to highlight AI cells in green
               aiMoves={aiMoves} 
             />
+
           </div>
           <Controls
             mode={mode}

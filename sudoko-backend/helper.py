@@ -43,19 +43,29 @@ def generate_random_board(difficulty='intermediate'):
         for r in range(i, i + 3):
             for c in range(i, i + 3):
                 board[r][c] = nums.pop()
+    
     backtracking(board, 0, 0)
 
-    attempts = {'easy': 35, 'intermediate': 45, 'hard': 55}.get(difficulty, 45)
-    while attempts > 0:
-        r = random.randint(0, 8)
-        c = random.randint(0, 8)
+    cells_to_remove = {'easy': 35, 'intermediate': 45, 'hard': 55}.get(difficulty, 45)
+    
+    all_positions = [(r, c) for r in range(9) for c in range(9)]
+    random.shuffle(all_positions)
+    
+    removed_count = 0
+    for r, c in all_positions:
+        if removed_count >= cells_to_remove:
+            break
+        
         if board[r][c] != 0:
             backup = board[r][c]
             board[r][c] = 0
+            
             board_copy = [row[:] for row in board]
-            if not is_solvable(board_copy):
+            if is_solvable(board_copy):
+                removed_count += 1
+            else:
                 board[r][c] = backup
-            attempts -= 1
+    
     return board
 
 def get_arcs(row, col):
@@ -69,7 +79,7 @@ def get_arcs(row, col):
     start_col = (col // 3) * 3
     for r in range(start_row, start_row + 3):
         for c in range(start_col, start_col + 3):
-            if r != row and c != col:
+            if (r, c) != (row, col):
                 neighbors.add((r, c))
     return neighbors
 
@@ -97,13 +107,9 @@ def backtracking(board, r=0, c=0):
                 board[r][c] = num
                 if backtracking(board, r, c + 1):
                     return True
-                board[r][c] = 0  # Reset on backtracking
+                board[r][c] = 0
         return False
     
-def is_valid_board_after_assignment(domains, row, col, num):
-    board = board_from_domains(domains)
-    return is_valid(board, row, col, num)
-
 def board_from_domains(domains):
     board = [[0] * 9 for _ in range(9)]
     for (r, c), dom in domains.items():
@@ -120,3 +126,14 @@ def select_unassigned_variable(domains):
             min_size = len(dom)
             best = (r, c)
     return best
+
+
+def serialize_domains(domains):
+    serialized = {}
+    for (r, c), values in domains.items():
+        # Convert tuple (0, 0) -> string "0,0"
+        key = f"{r},{c}" 
+        # Convert set {1, 2} -> list [1, 2]
+        val = list(values)
+        serialized[key] = val
+    return serialized
