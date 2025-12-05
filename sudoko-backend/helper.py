@@ -68,20 +68,6 @@ def generate_random_board(difficulty='intermediate'):
     
     return board
 
-def get_arcs(row, col):
-    neighbors = set()
-    for i in range(9):
-        if i != col :
-            neighbors.add((row, i)) #same row
-        if i != row :
-            neighbors.add((i, col))
-    start_row = (row // 3) * 3
-    start_col = (col // 3) * 3
-    for r in range(start_row, start_row + 3):
-        for c in range(start_col, start_col + 3):
-            if (r, c) != (row, col):
-                neighbors.add((r, c))
-    return neighbors
 
 def domain(board):
     domains = {}

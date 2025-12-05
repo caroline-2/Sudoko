@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Board from './components/Board';
 import Controls from './components/Controls';
+import ACVisualizer from './components/ACVisualizer';
 import './App.css';
 
 const App = () => {
@@ -9,6 +10,7 @@ const App = () => {
   const [initial, setInitial] = useState(Array(9).fill(0).map(() => Array(9).fill(0)));
   const [errors, setErrors] = useState(new Set());
   const [acHistory, setAcHistory] = useState([]);
+  const [showACVisualizer, setShowACVisualizer] = useState(false);
 
   const [selectedCell, setSelectedCell] = useState(null);
   
@@ -196,7 +198,14 @@ const handleSolve = async () => {
             onGenerate={handleGenerate}
             onReset={resetBoard}
             onGameModeChange={handleGameModeChange}
+            onShowAC={() => setShowACVisualizer(true)}   // ⬅ Added
           />
+        {showACVisualizer && (
+          <ACVisualizer 
+            history={acHistory}
+            onClose={() => setShowACVisualizer(false)}
+          />
+        )}
           
         </div>
       </div>
